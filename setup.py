@@ -17,7 +17,7 @@ setup(
     ),
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license='BSD-3-Clause',
+    license_files=('LICENSE',),
     homepage='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',
     repository='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',
     documentation='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',

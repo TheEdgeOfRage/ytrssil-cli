@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Union
 
 
 @dataclass
@@ -7,9 +8,10 @@ class Video:
     video_id: str
     name: str
     url: str
-    timestamp: datetime
     channel_id: str
     channel_name: str
+    timestamp: datetime
+    watch_timestamp: Union[datetime, None] = None
 
     def __str__(self) -> str:
         return f'{self.channel_name} - {self.name} - {self.video_id}'

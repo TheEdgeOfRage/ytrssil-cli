@@ -6,7 +6,8 @@ from inject import autoparams
 
 from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
-from ytrssil.repository import ChannelNotFound, ChannelRepository
+from ytrssil.exceptions import ChannelNotFound
+from ytrssil.repository import ChannelRepository
 
 
 class Parser(metaclass=ABCMeta):
