@@ -21,7 +21,7 @@ setup(
     homepage='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',
     repository='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',
     documentation='https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil',
-    version='0.0.0',
+    version='0.0.1',
     packages=['ytrssil'],
     package_data={'': ['py.typed']},
     include_package_data=True,
