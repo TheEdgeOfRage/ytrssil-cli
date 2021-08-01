@@ -2,11 +2,12 @@ from asyncio import gather, run
 from collections.abc import Iterable
 
 from aiohttp import ClientResponse, ClientSession
+from inject import autoparams
 
 from ytrssil.config import get_feed_urls
 from ytrssil.datatypes import Channel, Video
-from ytrssil.repository import ChannelRepository
 from ytrssil.parser import Parser
+from ytrssil.repository import ChannelRepository
 
 
 async def request(session: ClientSession, url: str) -> ClientResponse:
@@ -24,11 +25,13 @@ async def fetch_feeds(urls: Iterable[str]) -> Iterable[str]:
         ]
 
 
+@autoparams('parser', 'repository')
 def fetch_new_videos(
+    *,
+    parser: Parser,
     repository: ChannelRepository,
 ) -> tuple[dict[str, Channel], dict[str, Video]]:
     feed_urls = get_feed_urls()
-    parser = Parser(repository)
     channels: dict[str, Channel] = {}
     new_videos: dict[str, Video] = {}
     for feed in run(fetch_feeds(feed_urls)):

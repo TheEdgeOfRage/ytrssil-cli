@@ -23,11 +23,15 @@ class Channel:
     new_videos: dict[str, Video] = field(default_factory=lambda: dict())
     watched_videos: dict[str, Video] = field(default_factory=lambda: dict())
 
-    def add_video(self, video: Video) -> None:
-        if video.video_id in self.watched_videos:
-            return
+    def add_video(self, video: Video) -> bool:
+        if (
+            video.video_id in self.watched_videos
+            or video.video_id in self.new_videos
+        ):
+            return False
 
         self.new_videos[video.video_id] = video
+        return True
 
     def remove_old_videos(self) -> None:
         vid_list: list[Video] = sorted(
@@ -41,3 +45,6 @@ class Channel:
         self.new_videos.pop(video.video_id)
         self.watched_videos[video.video_id] = video
         self.remove_old_videos()
+
+    def __str__(self) -> str:
+        return f'{self.name} - {len(self.new_videos)}'
