@@ -19,3 +19,7 @@ def get_new_videos() -> list[Video]:
             return new_videos
 
     return list(_get_new_videos().values())
+
+
+def get_new_video_count() -> int:
+    return len(get_new_videos())

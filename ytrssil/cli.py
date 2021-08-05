@@ -111,11 +111,11 @@ def mark_as_watched(
     return 0
 
 
-def main() -> int:
+def main(args: list[str] = argv) -> int:
     setup_dependencies()
     command: str
     try:
-        command = argv[1]
+        command = args[1]
     except IndexError:
         command = 'watch'
 
@@ -124,7 +124,7 @@ def main() -> int:
     elif command == 'history':
         return watch_history()
     elif command == 'mark':
-        up_to_date = datetime.fromisoformat(argv[2])
+        up_to_date = datetime.fromisoformat(args[2])
         return mark_as_watched(up_to_date=up_to_date)
     else:
         print(f'Unknown command "{command}"', file=stderr)

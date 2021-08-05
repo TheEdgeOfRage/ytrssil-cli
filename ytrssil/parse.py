@@ -16,7 +16,7 @@ class Parser(metaclass=ABCMeta):
         self.repository = channel_repository
 
     @abstractmethod
-    def __call__(self, feed_content: str) -> Channel:
+    def __call__(self, feed_content: str) -> Channel:  # pragma: no cover
         pass
 
 
@@ -30,7 +30,6 @@ class FeedparserParser(Parser):
             channel = Channel(
                 channel_id=channel_id,
                 name=d['feed']['title'],
-                url=d['feed']['link'],
             )
             self.repository.create_channel(channel)
 
@@ -51,7 +50,7 @@ class FeedparserParser(Parser):
 
 @autoparams()
 def create_feed_parser(config: Configuration) -> Parser:
-    parser_type = config.feed_parser_type
+    parser_type = config.parser_type
     if parser_type == 'feedparser':
         return FeedparserParser()
     else:

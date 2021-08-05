@@ -4,7 +4,8 @@ import os
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from sqlite3 import connect
-from typing import Any, Union
+from types import TracebackType
+from typing import Any, Optional, Type
 
 from inject import autoparams
 
@@ -16,40 +17,48 @@ from ytrssil.exceptions import ChannelNotFound
 
 class ChannelRepository(metaclass=ABCMeta):
     @abstractmethod
-    def __enter__(self) -> ChannelRepository:
+    def __enter__(self) -> ChannelRepository:  # pragma: no cover
         pass
 
     @abstractmethod
     def __exit__(
         self,
-        exc_type: Any,
-        exc_value: Any,
-        exc_traceback: Any,
-    ) -> None:
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:  # pragma: no cover
         pass
 
     @abstractmethod
-    def get_channel(self, channel_id: str) -> Channel:
+    def get_channel(self, channel_id: str) -> Channel:  # pragma: no cover
         pass
 
     @abstractmethod
-    def get_all_channels(self) -> list[Channel]:
+    def get_all_channels(self) -> list[Channel]:  # pragma: no cover
         pass
 
     @abstractmethod
-    def get_watched_videos(self) -> dict[str, Video]:
+    def get_watched_videos(self) -> dict[str, Video]:  # pragma: no cover
         pass
 
     @abstractmethod
-    def create_channel(self, channel: Channel) -> None:
+    def create_channel(self, channel: Channel) -> None:  # pragma: no cover
         pass
 
     @abstractmethod
-    def add_new_video(self, channel: Channel, video: Video) -> None:
+    def add_new_video(
+        self,
+        channel: Channel,
+        video: Video,
+    ) -> None:  # pragma: no cover
         pass
 
     @abstractmethod
-    def update_video(self, video: Video, watch_timestamp: datetime) -> None:
+    def update_video(
+        self,
+        video: Video,
+        watch_timestamp: datetime,
+    ) -> None:  # pragma: no cover
         pass
 
 
@@ -65,7 +74,7 @@ class SqliteChannelRepository(ChannelRepository):
         cursor.execute('PRAGMA foreign_keys = ON')
         cursor.execute(
             'CREATE TABLE IF NOT EXISTS channels ('
-            'channel_id VARCHAR PRIMARY KEY, name VARCHAR, url VARCHAR UNIQUE)'
+            'channel_id VARCHAR PRIMARY KEY, name VARCHAR)'
         )
         cursor.execute(
             'CREATE TABLE IF NOT EXISTS videos ('
@@ -82,9 +91,9 @@ class SqliteChannelRepository(ChannelRepository):
 
     def __exit__(
         self,
-        exc_type: Any,
-        exc_value: Any,
-        exc_traceback: Any,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ) -> None:
         self.connection.close()
 
@@ -92,7 +101,6 @@ class SqliteChannelRepository(ChannelRepository):
         return {
             'channel_id': channel.channel_id,
             'name': channel.name,
-            'url': channel.url,
         }
 
     def channel_data_to_channel(
@@ -102,7 +110,6 @@ class SqliteChannelRepository(ChannelRepository):
         channel = Channel(
             channel_id=channel_data[0],
             name=channel_data[1],
-            url=channel_data[2],
         )
         for video in self.get_videos_for_channel(channel):
             if video.watch_timestamp is not None:
@@ -113,7 +120,7 @@ class SqliteChannelRepository(ChannelRepository):
         return channel
 
     def video_to_params(self, video: Video) -> dict[str, Any]:
-        watch_timestamp: Union[str, None]
+        watch_timestamp: Optional[str]
         if video.watch_timestamp is not None:
             watch_timestamp = video.watch_timestamp.isoformat()
         else:
@@ -134,7 +141,7 @@ class SqliteChannelRepository(ChannelRepository):
         channel_id: str,
         channel_name: str,
     ) -> Video:
-        watch_timestamp: Union[datetime, None]
+        watch_timestamp: Optional[datetime]
         if video_data[4] is not None:
             watch_timestamp = datetime.fromisoformat(video_data[4])
         else:
@@ -193,7 +200,7 @@ class SqliteChannelRepository(ChannelRepository):
     def get_watched_videos(self) -> dict[str, Video]:
         cursor = self.connection.cursor()
         cursor.execute(
-            'SELECT video_id, videos.name, videos.url, timestamp, '
+            'SELECT video_id, videos.name, url, timestamp, '
             'watch_timestamp, channels.channel_id, channels.name FROM videos '
             'LEFT JOIN channels ON channels.channel_id=videos.channel_id WHERE '
             'watch_timestamp IS NOT NULL ORDER BY timestamp'
@@ -211,7 +218,7 @@ class SqliteChannelRepository(ChannelRepository):
     def create_channel(self, channel: Channel) -> None:
         cursor = self.connection.cursor()
         cursor.execute(
-            'INSERT INTO channels VALUES (:channel_id, :name, :url)',
+            'INSERT INTO channels VALUES (:channel_id, :name)',
             self.channel_to_params(channel),
         )
         self.connection.commit()
@@ -220,7 +227,7 @@ class SqliteChannelRepository(ChannelRepository):
         cursor = self.connection.cursor()
         cursor.execute(
             'UPDATE channels SET channel_id = :channel_id, name = :name, '
-            'url = :url WHERE channel_id=:channel_id',
+            'WHERE channel_id=:channel_id',
             self.channel_to_params(channel),
         )
         self.connection.commit()

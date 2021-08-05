@@ -1,6 +1,9 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Union
+from typing import Optional
+
+from ytrssil.types import ChannelData, VideoData
 
 
 @dataclass
@@ -11,17 +14,20 @@ class Video:
     channel_id: str
     channel_name: str
     timestamp: datetime
-    watch_timestamp: Union[datetime, None] = None
+    watch_timestamp: Optional[datetime] = None
 
     def __str__(self) -> str:
         return f'{self.channel_name} - {self.name} - {self.video_id}'
+
+    @classmethod
+    def from_dict(cls, data: VideoData) -> Video:
+        return cls(**data)
 
 
 @dataclass
 class Channel:
     channel_id: str
     name: str
-    url: str
     new_videos: dict[str, Video] = field(default_factory=lambda: dict())
     watched_videos: dict[str, Video] = field(default_factory=lambda: dict())
 
@@ -35,18 +41,18 @@ class Channel:
         self.new_videos[video.video_id] = video
         return True
 
-    def remove_old_videos(self) -> None:
-        vid_list: list[Video] = sorted(
-            self.watched_videos.values(),
-            key=lambda x: x.timestamp,
-        )
-        for video in vid_list[15:]:
-            self.watched_videos.pop(video.video_id)
-
     def mark_video_as_watched(self, video: Video) -> None:
         self.new_videos.pop(video.video_id)
         self.watched_videos[video.video_id] = video
-        self.remove_old_videos()
 
     def __str__(self) -> str:
         return f'{self.name} - {len(self.new_videos)}'
+
+    @classmethod
+    def from_dict(cls, data: ChannelData) -> Channel:
+        return cls(
+            channel_id=data['channel_id'],
+            name=data['name'],
+            new_videos=data.get('new_videos', {}).copy(),
+            watched_videos=data.get('watched_videos', {}).copy(),
+        )

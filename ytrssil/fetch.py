@@ -5,24 +5,26 @@ from collections.abc import Iterable
 from aiohttp import ClientResponse, ClientSession
 from inject import autoparams
 
-from ytrssil.config import Configuration, get_feed_urls
+from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
 from ytrssil.parse import Parser
-from ytrssil.repository import ChannelRepository
 
 
 class Fetcher(metaclass=ABCMeta):
     @abstractmethod
-    def fetch_feeds(self, urls: Iterable[str]) -> Iterable[str]:
+    def fetch_feeds(
+        self,
+        urls: Iterable[str],
+    ) -> Iterable[str]:  # pragma: no cover
         pass
 
-    @autoparams('parser', 'repository')
+    @autoparams()
     def fetch_new_videos(
         self,
+        config: Configuration,
         parser: Parser,
-        repository: ChannelRepository,
     ) -> tuple[dict[str, Channel], dict[str, Video]]:
-        feed_urls = get_feed_urls()
+        feed_urls = config.get_feed_urls()
         channels: dict[str, Channel] = {}
         new_videos: dict[str, Video] = {}
         for feed in self.fetch_feeds(feed_urls):
@@ -35,11 +37,11 @@ class Fetcher(metaclass=ABCMeta):
 
 class AioHttpFetcher(Fetcher):
     async def request(self, session: ClientSession, url: str) -> ClientResponse:
-        return await session.request(method='GET', url=url)
+        return await session.get(url=url)
 
     async def async_fetch_feeds(self, urls: Iterable[str]) -> Iterable[str]:
         async with ClientSession() as session:
-            responses: list[ClientResponse] = await gather(*[
+            responses: Iterable[ClientResponse] = await gather(*[
                 self.request(session, url) for url in urls
             ])
             return [
