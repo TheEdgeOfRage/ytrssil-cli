@@ -72,6 +72,32 @@ def watch_videos(
 
 
 @autoparams()
+def print_url(
+    repository_manager: ChannelRepository,
+    fetcher: Fetcher,
+) -> int:
+    with repository_manager as repository:
+        channels, new_videos = fetcher.fetch_new_videos()
+        if not new_videos:
+            print('No new videos', file=stderr)
+            return 1
+
+        selected_videos = user_query(new_videos)
+        if not selected_videos:
+            print('No video selected', file=stderr)
+            return 2
+
+        for video in selected_videos:
+            selected_channel = channels[video.channel_id]
+            selected_channel.mark_video_as_watched(video)
+            watch_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
+            repository.update_video(video, watch_timestamp)
+            print(video.url)
+
+    return 0
+
+
+@autoparams()
 def watch_history(
     repository_manager: ChannelRepository,
     fetcher: Fetcher,
@@ -121,6 +147,8 @@ def main(args: list[str] = argv) -> int:
 
     if command == 'watch':
         return watch_videos()
+    elif command == 'print':
+        return print_url()
     elif command == 'history':
         return watch_history()
     elif command == 'mark':
