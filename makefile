@@ -25,6 +25,9 @@ validate: flake8 mypy isort
 coverage:
 	python -m pytest --cov $(CURDIR)/$(NAME) --cov-report html
 
+build:
+	python setup.py sdist bdist_wheel
+
 clean:
 	rm -rf $(CURDIR)/build
 	rm -rf $(CURDIR)/dist
