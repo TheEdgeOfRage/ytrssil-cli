@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from ytrssil.types import ChannelData, VideoData
-
+from ytrssil.datatypes import ChannelData, VideoData
 
 FEED_XML: str = '''
 <?xml version="1.0" encoding="UTF-8"?>
@@ -30,5 +29,6 @@ TEST_VIDEO_DATA: VideoData = {
 TEST_CHANNEL_DATA: ChannelData = {
     'channel_id': 'channel_id',
     'name': 'channel_name',
-    'new_videos': {}
+    'new_videos': {},
+    'watched_videos': {},
 }

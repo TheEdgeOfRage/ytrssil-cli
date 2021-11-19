@@ -1,9 +1,25 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional, TypedDict
 
-from ytrssil.types import ChannelData, VideoData
+
+class VideoData(TypedDict):
+    video_id: str
+    name: str
+    url: str
+    channel_id: str
+    channel_name: str
+    timestamp: datetime
+    watch_timestamp: Optional[datetime]
+
+
+class ChannelData(TypedDict):
+    channel_id: str
+    name: str
+    new_videos: dict[str, Any]
+    watched_videos: dict[str, Any]
 
 
 @dataclass

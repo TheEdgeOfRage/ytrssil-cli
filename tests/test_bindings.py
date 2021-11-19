@@ -1,8 +1,9 @@
 from ytrssil.bindings import setup_dependencies
 from ytrssil.config import Configuration
-from ytrssil.fetch import Fetcher, AioHttpFetcher
-from ytrssil.parse import Parser, FeedparserParser
-from ytrssil.repository import ChannelRepository, SqliteChannelRepository
+from ytrssil.fetch import AioHttpFetcher
+from ytrssil.parse import FeedparserParser
+from ytrssil.protocols import ChannelRepository, Fetcher, Parser
+from ytrssil.repository import SqliteChannelRepository
 
 
 def test_setup_dependencies() -> None:

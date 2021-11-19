@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 import os
-from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from sqlite3 import connect
 from types import TracebackType
@@ -13,56 +10,10 @@ from ytrssil.config import Configuration
 from ytrssil.constants import config_dir
 from ytrssil.datatypes import Channel, Video
 from ytrssil.exceptions import ChannelNotFound
+from ytrssil.protocols import ChannelRepository
 
 
-class ChannelRepository(metaclass=ABCMeta):
-    @abstractmethod
-    def __enter__(self) -> ChannelRepository:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def get_channel(self, channel_id: str) -> Channel:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def get_all_channels(self) -> list[Channel]:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def get_watched_videos(self) -> dict[str, Video]:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def create_channel(self, channel: Channel) -> None:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def add_new_video(
-        self,
-        channel: Channel,
-        video: Video,
-    ) -> None:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def update_video(
-        self,
-        video: Video,
-        watch_timestamp: datetime,
-    ) -> None:  # pragma: no cover
-        pass
-
-
-class SqliteChannelRepository(ChannelRepository):
+class SqliteChannelRepository:
     def __init__(self) -> None:
         os.makedirs(config_dir, exist_ok=True)
         self.file_path: str = os.path.join(config_dir, 'channels.db')
@@ -202,8 +153,26 @@ class SqliteChannelRepository(ChannelRepository):
         cursor.execute(
             'SELECT video_id, videos.name, url, timestamp, '
             'watch_timestamp, channels.channel_id, channels.name FROM videos '
-            'LEFT JOIN channels ON channels.channel_id=videos.channel_id WHERE '
-            'watch_timestamp IS NOT NULL ORDER BY timestamp'
+            'LEFT JOIN channels ON channels.channel_id=videos.channel_id '
+            'WHERE watch_timestamp IS NOT NULL ORDER BY timestamp'
+        )
+
+        return {
+            video_data[0]: self.video_data_to_video(
+                video_data=video_data,
+                channel_id=video_data[5],
+                channel_name=video_data[6],
+            )
+            for video_data in cursor
+        }
+
+    def get_new_videos(self) -> dict[str, Video]:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            'SELECT video_id, videos.name, url, timestamp, '
+            'watch_timestamp, channels.channel_id, channels.name FROM videos '
+            'LEFT JOIN channels ON channels.channel_id=videos.channel_id '
+            'WHERE watch_timestamp IS NULL ORDER BY timestamp'
         )
 
         return {

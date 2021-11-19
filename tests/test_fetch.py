@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from collections.abc import Iterable
 
 from aioresponses import aioresponses
@@ -6,11 +7,11 @@ from aioresponses import aioresponses
 from tests.constants import FEED_XML, TEST_CHANNEL_DATA, TEST_VIDEO_DATA
 from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
-from ytrssil.fetch import AioHttpFetcher, Fetcher
+from ytrssil.fetch import AioHttpFetcher, FetcherBase
 
 
-def test_fetch_new_videos():
-    class MockFetcher(Fetcher):
+def test_fetch_new_videos() -> None:
+    class MockFetcher(FetcherBase):
         def fetch_feeds(self, urls: Iterable[str]) -> Iterable[str]:
             return [FEED_XML]
 
@@ -30,7 +31,7 @@ def test_fetch_new_videos():
     assert new_videos[TEST_VIDEO_DATA['video_id']] == video
 
 
-def test_aiohttpfetcher_fetch_feeds():
+def test_aiohttpfetcher_fetch_feeds() -> None:
     feed_url = 'test_url'
     with aioresponses() as mocked:
         mocked.get(

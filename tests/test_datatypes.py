@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from tests.constants import TEST_CHANNEL_DATA, TEST_VIDEO_DATA
-from ytrssil.datatypes import Channel, Video
+from ytrssil.datatypes import Channel, ChannelData, Video
 
 
 def test_video_str() -> None:
@@ -11,8 +11,8 @@ def test_video_str() -> None:
 
 
 def test_channel_str() -> None:
-    channel = Channel.from_dict({
-        **TEST_CHANNEL_DATA,
+    channel_data: ChannelData = TEST_CHANNEL_DATA.copy()
+    channel_data.update({
         'new_videos': {
             'video_id': Video(
                 video_id='video_id',
@@ -25,13 +25,14 @@ def test_channel_str() -> None:
             ),
         },
     })
-    string = str(channel)
+    channel_string = str(Channel.from_dict(channel_data))
 
-    assert string == 'channel_name - 1'
+    assert channel_string == 'channel_name - 1'
 
 
 def test_channel_add_new_video() -> None:
-    channel = Channel.from_dict(TEST_CHANNEL_DATA)
+    channel_data: ChannelData = TEST_CHANNEL_DATA.copy()
+    channel = Channel.from_dict(channel_data)
     added_video = channel.add_video(Video(
         video_id='video_id',
         name='video_name',
@@ -47,8 +48,8 @@ def test_channel_add_new_video() -> None:
 
 
 def test_channel_add_existing_video() -> None:
-    channel = Channel.from_dict({
-        **TEST_CHANNEL_DATA,
+    channel_data: ChannelData = TEST_CHANNEL_DATA.copy()
+    channel_data.update({
         'new_videos': {
             'video_id': Video(
                 video_id='video_id',
@@ -61,6 +62,7 @@ def test_channel_add_existing_video() -> None:
             ),
         },
     })
+    channel = Channel.from_dict(channel_data)
     added_video = channel.add_video(Video(
         video_id='video_id',
         name='video_name',
@@ -85,10 +87,10 @@ def test_channel_mark_video_as_watched() -> None:
         timestamp=datetime.fromisoformat('1970-01-01T00:00:00+00:00'),
         watch_timestamp=None,
     )
-    channel = Channel.from_dict({
-        **TEST_CHANNEL_DATA,
-        'new_videos': {'video_id': video},
-    })
+
+    channel_data: ChannelData = TEST_CHANNEL_DATA.copy()
+    channel_data.update({'new_videos': {'video_id': video}})
+    channel = Channel.from_dict(channel_data)
 
     channel.mark_video_as_watched(video)
 

@@ -7,8 +7,8 @@ from tests.constants import FEED_XML, TEST_CHANNEL_DATA, TEST_VIDEO_DATA
 from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
 from ytrssil.exceptions import ChannelNotFound
-from ytrssil.parse import create_feed_parser, FeedparserParser
-from ytrssil.repository import ChannelRepository
+from ytrssil.parse import FeedparserParser, create_feed_parser
+from ytrssil.protocols import ChannelRepository
 
 
 def test_feedparser_channel_exists() -> None:

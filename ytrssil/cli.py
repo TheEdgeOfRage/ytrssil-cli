@@ -10,8 +10,7 @@ from inject import autoparams
 from ytrssil.bindings import setup_dependencies
 from ytrssil.constants import mpv_options
 from ytrssil.datatypes import Video
-from ytrssil.fetch import Fetcher
-from ytrssil.repository import ChannelRepository
+from ytrssil.protocols import ChannelRepository, Fetcher
 
 
 def user_query(videos: dict[str, Video], reverse: bool = False) -> list[Video]:
@@ -42,12 +41,26 @@ def user_query(videos: dict[str, Video], reverse: bool = False) -> list[Video]:
 
 
 @autoparams()
+def fetch_new_videos(
+    repository_manager: ChannelRepository,
+    fetcher: Fetcher,
+) -> int:
+    with repository_manager as _:
+        _, new_videos = fetcher.fetch_new_videos()
+        if not new_videos:
+            print('No new videos', file=stderr)
+            return 1
+
+    return 0
+
+
+@autoparams()
 def watch_videos(
     repository_manager: ChannelRepository,
     fetcher: Fetcher,
 ) -> int:
     with repository_manager as repository:
-        channels, new_videos = fetcher.fetch_new_videos()
+        new_videos = repository.get_new_videos()
         if not new_videos:
             print('No new videos', file=stderr)
             return 1
@@ -63,7 +76,7 @@ def watch_videos(
             execv(cmd[0], cmd)
 
         for video in selected_videos:
-            selected_channel = channels[video.channel_id]
+            selected_channel = repository.get_channel(video.channel_id)
             selected_channel.mark_video_as_watched(video)
             watch_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
             repository.update_video(video, watch_timestamp)
@@ -77,7 +90,7 @@ def print_url(
     fetcher: Fetcher,
 ) -> int:
     with repository_manager as repository:
-        channels, new_videos = fetcher.fetch_new_videos()
+        new_videos = repository.get_new_videos()
         if not new_videos:
             print('No new videos', file=stderr)
             return 1
@@ -88,7 +101,7 @@ def print_url(
             return 2
 
         for video in selected_videos:
-            selected_channel = channels[video.channel_id]
+            selected_channel = repository.get_channel(video.channel_id)
             selected_channel.mark_video_as_watched(video)
             watch_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
             repository.update_video(video, watch_timestamp)
@@ -145,7 +158,9 @@ def main(args: list[str] = argv) -> int:
     except IndexError:
         command = 'watch'
 
-    if command == 'watch':
+    if command == 'fetch':
+        return fetch_new_videos()
+    elif command == 'watch':
         return watch_videos()
     elif command == 'print':
         return print_url()
@@ -157,3 +172,5 @@ def main(args: list[str] = argv) -> int:
     else:
         print(f'Unknown command "{command}"', file=stderr)
         return 1
+
+    return 0

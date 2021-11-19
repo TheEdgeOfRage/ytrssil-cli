@@ -1,4 +1,3 @@
-from abc import ABCMeta, abstractmethod
 from datetime import datetime
 
 import feedparser
@@ -7,20 +6,16 @@ from inject import autoparams
 from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
 from ytrssil.exceptions import ChannelNotFound
-from ytrssil.repository import ChannelRepository
+from ytrssil.protocols import ChannelRepository, Parser
 
 
-class Parser(metaclass=ABCMeta):
+class ParserBase:
     @autoparams('channel_repository')
     def __init__(self, channel_repository: ChannelRepository) -> None:
         self.repository = channel_repository
 
-    @abstractmethod
-    def __call__(self, feed_content: str) -> Channel:  # pragma: no cover
-        pass
 
-
-class FeedparserParser(Parser):
+class FeedparserParser(ParserBase):
     def __call__(self, feed_content: str) -> Channel:
         d = feedparser.parse(feed_content)
         channel_id: str = d['feed']['yt_channelid']

@@ -2,8 +2,7 @@ from inject import autoparams
 
 from ytrssil.bindings import setup_dependencies
 from ytrssil.datatypes import Video
-from ytrssil.fetch import Fetcher
-from ytrssil.repository import ChannelRepository
+from ytrssil.protocols import ChannelRepository, Fetcher
 
 
 def get_new_videos() -> list[Video]:

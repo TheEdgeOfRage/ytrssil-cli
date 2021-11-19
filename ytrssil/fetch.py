@@ -1,4 +1,3 @@
-from abc import ABCMeta, abstractmethod
 from asyncio import gather, run
 from collections.abc import Iterable
 
@@ -7,16 +6,15 @@ from inject import autoparams
 
 from ytrssil.config import Configuration
 from ytrssil.datatypes import Channel, Video
-from ytrssil.parse import Parser
+from ytrssil.protocols import Fetcher, Parser
 
 
-class Fetcher(metaclass=ABCMeta):
-    @abstractmethod
+class FetcherBase:
     def fetch_feeds(
         self,
         urls: Iterable[str],
     ) -> Iterable[str]:  # pragma: no cover
-        pass
+        raise NotImplementedError
 
     @autoparams()
     def fetch_new_videos(
@@ -35,8 +33,12 @@ class Fetcher(metaclass=ABCMeta):
         return channels, new_videos
 
 
-class AioHttpFetcher(Fetcher):
-    async def request(self, session: ClientSession, url: str) -> ClientResponse:
+class AioHttpFetcher(FetcherBase):
+    async def request(
+        self,
+        session: ClientSession,
+        url: str,
+    ) -> ClientResponse:
         return await session.get(url=url)
 
     async def async_fetch_feeds(self, urls: Iterable[str]) -> Iterable[str]:

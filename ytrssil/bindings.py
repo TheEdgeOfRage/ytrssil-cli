@@ -1,9 +1,10 @@
 from inject import Binder, Injector, clear_and_configure, get_injector_or_die
 
 from ytrssil.config import Configuration
-from ytrssil.fetch import Fetcher, create_fetcher
-from ytrssil.parse import Parser, create_feed_parser
-from ytrssil.repository import ChannelRepository, create_channel_repository
+from ytrssil.fetch import create_fetcher
+from ytrssil.parse import create_feed_parser
+from ytrssil.protocols import ChannelRepository, Fetcher, Parser
+from ytrssil.repository import create_channel_repository
 
 
 def dependency_configuration(binder: Binder) -> None:
