@@ -19,8 +19,10 @@ class HttpClient:
         resp.raise_for_status()
 
     def register(self) -> None:
-        user = User(username=self.auth.username, password=self.auth.password)
-        resp = requests.post(url=f'{self.base_url}/fetch', json=user)
+        resp = requests.post(url=f'{self.base_url}/register', json={
+            'username': self.auth.username,
+            'password': self.auth.password,
+        })
         resp.raise_for_status()
 
     def subscribe_to_channel(self, channel_id: str) -> None:

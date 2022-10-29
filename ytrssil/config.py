@@ -9,14 +9,14 @@ class Configuration:
     username: str
     password: str
     api_url: str = 'https://ytrssil.theedgeofrage.com'
-    max_res: Literal['480', '720', '1080', '1440', '2160'] = '1440'
+    max_resolution: Literal['480', '720', '1080', '1440', '2160'] = '1440'
 
     @property
     def mpv_options(self) -> list[str]:
-        return [
-            '--no-terminal',
-            f'--ytdl-format=bestvideo[height<=?{self.max_res}]+bestaudio/best',
-        ]
+        return ['--no-terminal', (
+            '--ytdl-format=bestvideo[height<=?'
+            f'{self.max_resolution}]+bestaudio/best'
+        )]
 
 
 def load_config() -> Configuration:
