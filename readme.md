@@ -1,14 +1,20 @@
 # YouTube RSS manager
 
 This is a simple CLI to manage YouTube subscriptions through RSS feeds
-and watch new videos using `mpv`. It keeps track of watched videos in a local
-sqlite database.
-
-**This tool is still in early development and breaking changes across minor
-versions are expected.**
+and watch new videos using `mpv`.
 
 ## Configuration
 
-It looks for a list of RSS URLs in `$XDG_CONFIG_HOME/ytrssil/feeds`
-(~/.config/ by default), with one URL per line. Only YouTube channel feeds
-are supported at this moment.
+It looks for a configuration in `$XDG_CONFIG_HOME/ytrssil/config.json`
+(~/.config/ by default).
+
+Example:
+
+```json
+{
+    "username": "username",
+    "password": "password",
+    "api_url": "https://example.com",
+    "max_resolution": "1080"
+}
+```

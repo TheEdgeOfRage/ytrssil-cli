@@ -1,30 +1,33 @@
-from __future__ import annotations
-
+import json
 import os
-from collections.abc import Iterator
-from dataclasses import dataclass, field
-from typing import Any
-
-from ytrssil.constants import config_dir
+from dataclasses import dataclass
+from typing import Literal
 
 
 @dataclass
 class Configuration:
-    feed_url_getter_type: str = 'file'
-    feed_urls: list[str] = field(default_factory=lambda: list())
-    channel_repository_type: str = 'sqlite'
-    fetcher_type: str = 'aiohttp'
-    parser_type: str = 'feedparser'
+    username: str
+    password: str
+    api_url: str = 'https://ytrssil.theedgeofrage.com'
+    max_res: Literal['480', '720', '1080', '1440', '2160'] = '1440'
 
-    @classmethod
-    def from_dict(cls, config_dict: dict[str, Any]) -> Configuration:
-        return cls(**config_dict)
+    @property
+    def mpv_options(self) -> list[str]:
+        return [
+            '--no-terminal',
+            f'--ytdl-format=bestvideo[height<=?{self.max_res}]+bestaudio/best',
+        ]
 
-    def get_feed_urls(self) -> Iterator[str]:
-        if self.feed_url_getter_type == 'file':
-            file_path = os.path.join(config_dir, 'feeds')
-            with open(file_path, 'r') as f:
-                for line in f:
-                    yield line.strip()
-        elif self.feed_url_getter_type == 'static':
-            yield from self.feed_urls
+
+def load_config() -> Configuration:
+    config_prefix: str
+    try:
+        config_prefix = os.environ['XDG_CONFIG_HOME']
+    except KeyError:
+        config_prefix = os.path.expanduser('~/.config')
+
+    config_path: str = os.path.join(config_prefix, 'ytrssil', 'config.json')
+    with open(config_path) as f:
+        config_data = json.load(f)
+
+    return Configuration(**config_data)

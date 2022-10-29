@@ -1,18 +1,13 @@
 from inject import Binder, Injector, clear_and_configure, get_injector_or_die
 
-from ytrssil.config import Configuration
-from ytrssil.fetch import create_fetcher
-from ytrssil.parse import create_feed_parser
-from ytrssil.protocols import ChannelRepository, Fetcher, Parser
-from ytrssil.repository import create_channel_repository
+from ytrssil.client import HttpClient
+from ytrssil.config import Configuration, load_config
+from ytrssil.protocols import Client
 
 
 def dependency_configuration(binder: Binder) -> None:
-    config = Configuration()
-    binder.bind(Configuration, config)
-    binder.bind_to_constructor(ChannelRepository, create_channel_repository)
-    binder.bind_to_constructor(Fetcher, create_fetcher)
-    binder.bind_to_constructor(Parser, create_feed_parser)
+    binder.bind(Configuration, load_config())
+    binder.bind_to_constructor(Client, HttpClient)
 
 
 def setup_dependencies() -> Injector:
