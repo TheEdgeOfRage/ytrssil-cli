@@ -2,7 +2,7 @@ import requests
 from inject import autoparams
 
 from ytrssil.config import Configuration
-from ytrssil.datatypes import User, Video
+from ytrssil.datatypes import Video
 
 
 class HttpClient:
@@ -33,7 +33,7 @@ class HttpClient:
         resp.raise_for_status()
 
     def get_new_videos(self) -> list[Video]:
-        resp = requests.post(
+        resp = requests.get(
             url=f'{self.base_url}/api/videos/new',
             auth=self.auth,
         )
@@ -46,7 +46,7 @@ class HttpClient:
         return ret
 
     def get_watched_videos(self) -> list[Video]:
-        resp = requests.post(
+        resp = requests.get(
             url=f'{self.base_url}/api/videos/watched',
             auth=self.auth,
         )

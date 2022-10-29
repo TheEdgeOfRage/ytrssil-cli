@@ -6,13 +6,13 @@ from typing import Optional
 @dataclass
 class Video:
     video_id: str
-    name: str
+    title: str
     channel_name: str
-    timestamp: datetime
+    published_timestamp: datetime
     watch_timestamp: Optional[datetime] = None
 
     def __str__(self) -> str:
-        return f'{self.channel_name} - {self.name} - {self.video_id}'
+        return f'{self.channel_name} - {self.title} - {self.video_id}'
 
 
 @dataclass

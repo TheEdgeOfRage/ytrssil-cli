@@ -29,6 +29,9 @@ def user_query(videos: list[Video], reverse: bool = False) -> list[str]:
     videos_str: list[str] = stdout.decode('UTF-8').strip().split('\n')
     ret: list[str] = []
     for video_str in videos_str:
+        if video_str == '':
+            continue
+
         *_, video_id = video_str.split(' - ')
 
         try:
@@ -40,7 +43,7 @@ def user_query(videos: list[Video], reverse: bool = False) -> list[str]:
 
 
 @autoparams()
-def fetch_new_videos(client: Client) -> int:
+def fetch(client: Client) -> int:
     client.fetch()
     return 0
 
@@ -48,6 +51,12 @@ def fetch_new_videos(client: Client) -> int:
 @autoparams()
 def register(client: Client) -> int:
     client.register()
+    return 0
+
+
+@autoparams('client')
+def subscribe_to_channel(client: Client, channel_id: str) -> int:
+    client.subscribe_to_channel(channel_id)
     return 0
 
 
@@ -164,9 +173,18 @@ def main(args: list[str] = argv) -> Any:
         command = 'watch'
 
     if command == 'fetch':
-        return fetch_new_videos()
+        return fetch()
     elif command == 'register':
         return register()
+    elif command == 'subscribe':
+        if len(args) < 3:
+            print(
+                'Missing channel ID argument for subscribe command',
+                file=stderr,
+            )
+            return 1
+
+        return subscribe_to_channel(channel_id=args[2])
     elif command == 'watch':
         return watch_videos()
     elif command == 'print':
