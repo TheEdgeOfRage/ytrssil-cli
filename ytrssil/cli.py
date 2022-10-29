@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from os import execv, fork
 from subprocess import PIPE, Popen
 from sys import argv, stderr
+from typing import Any
 
 from inject import autoparams
 
@@ -154,7 +155,7 @@ def mark_as_unwatched(client: Client) -> int:
     return 0
 
 
-def main(args: list[str] = argv) -> int:
+def main(args: list[str] = argv) -> Any:
     setup_dependencies()
     command: str
     try:
