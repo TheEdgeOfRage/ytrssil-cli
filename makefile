@@ -29,3 +29,11 @@ clean:
 	rm -rf $(CURDIR)/build
 	rm -rf $(CURDIR)/dist
 	rm -rf $(CURDIR)/$(NAME).egg-info
+
+publish:
+	@git checkout $(shell git tag | sort -V | tail -n1) >/dev/null 2>&1
+	@$(MAKE) clean > /dev/null
+	@$(MAKE) build > /dev/null
+	@twine upload dist/*
+	@$(MAKE) clean > /dev/null
+	@git switch main >/dev/null 2>&1
