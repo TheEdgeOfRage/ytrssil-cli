@@ -12,8 +12,7 @@ Example:
 
 ```json
 {
-    "username": "username",
-    "password": "password",
+    "token": "token",
     "api_url": "https://example.com",
     "max_resolution": "1080"
 }
