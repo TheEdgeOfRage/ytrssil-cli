@@ -9,10 +9,11 @@ class Video:
     title: str
     channel_name: str
     published_timestamp: datetime
+    short: bool
     watch_timestamp: Optional[datetime] = None
 
     def __str__(self) -> str:
-        return f'{self.channel_name} - {self.title} - {self.video_id}'
+        return f"{self.channel_name} - {self.title} - {self.video_id}"
 
 
 @dataclass
@@ -21,10 +22,4 @@ class Channel:
     name: str
 
     def __str__(self) -> str:
-        return f'{self.name} - {self.channel_id}'
-
-
-@dataclass
-class User:
-    username: str
-    password: str
+        return f"{self.name} - {self.channel_id}"
