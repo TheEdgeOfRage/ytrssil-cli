@@ -1,7 +1,13 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, NotRequired, TypedDict, cast
+
+
+class ConfigDict(TypedDict):
+    token: str
+    api_url: NotRequired[str]
+    max_resolution: NotRequired[Literal["480", "720", "1080", "1440", "2160"]]
 
 
 @dataclass
@@ -27,6 +33,6 @@ def load_config() -> Configuration:
 
     config_path: str = os.path.join(config_prefix, "ytrssil", "config.json")
     with open(config_path) as f:
-        config_data = json.load(f)
+        config_data = cast(ConfigDict, json.load(f))
 
     return Configuration(**config_data)

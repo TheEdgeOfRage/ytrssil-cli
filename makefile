@@ -1,25 +1,23 @@
-.PHONY: setup-dev flake8 isort isort-fix mypy lint build clean
+.PHONY: setup-dev ruff isort isort-fix pyright lint build clean
 
 NAME = ytrssil
-
-FILES_PY = $(shell find $(CURDIR)/$(NAME) -type f -name "*.py")
 
 setup-dev:
 	uv sync
 
-flake8:
-	@uv run flake8 $(FILES_PY)
+ruff:
+	ruff check
 
 isort:
-	@uv run isort -c $(FILES_PY)
+	@uv run isort -c .
 
 isort-fix:
-	@uv run isort $(FILES_PY)
+	@uv run isort .
 
-mypy:
-	@uv run mypy --strict $(FILES_PY)
+pyright:
+	@uv run basedpyright
 
-lint: flake8 isort mypy
+lint: ruff isort pyright
 
 build:
 	uv build
@@ -30,9 +28,9 @@ clean:
 	rm -rf $(CURDIR)/$(NAME).egg-info
 
 publish:
-	@git checkout $(shell git tag | sort -V | tail -n1) >/dev/null 2>&1
-	@$(MAKE) clean > /dev/null
-	@$(MAKE) build > /dev/null
+	@git checkout $(shell git tag | sort -V | tail -n1)
+	@$(MAKE) clean
+	@$(MAKE) build
 	@uv publish
-	@$(MAKE) clean > /dev/null
-	@git switch main >/dev/null 2>&1
+	@$(MAKE) clean
+	@git switch main
