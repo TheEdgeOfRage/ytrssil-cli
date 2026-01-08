@@ -31,6 +31,6 @@ publish:
 	@git checkout $(shell git tag | sort -V | tail -n1)
 	@$(MAKE) clean
 	@$(MAKE) build
-	@uv publish
+	@uv publish --username __token__
 	@$(MAKE) clean
 	@git switch main

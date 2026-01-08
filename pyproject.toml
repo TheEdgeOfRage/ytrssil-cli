@@ -20,7 +20,7 @@ dependencies = []
 ytrssil = "ytrssil.main:main"
 
 [project.urls]
-Homepage = "https://gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil"
+Homepage = "https://github.com/TheEdgeOfRage/ytrssil/cli"
 
 [dependency-groups]
 dev = [
